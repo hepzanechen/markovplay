@@ -1,9 +1,14 @@
+import React from 'react'; // Ensure React is imported
 import { createRoot } from 'react-dom/client';
 import App from './App';
 
-import './index.css';
+import './styles/index.css';
 
 const container = document.querySelector('#app');
-const root = createRoot(container);
 
-root.render(<App />);
+if (container) {
+  const root = createRoot(container);
+  root.render(<App />);
+} else {
+  console.error("Container not found");
+}
