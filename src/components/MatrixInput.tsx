@@ -9,13 +9,26 @@ interface MatrixInputFormProps {
 }
 
 const MatrixInputForm: React.FC<MatrixInputFormProps> = ({ size, setSize, setMatrix, setStateNames }) => {
-  const [stateNamesInput, setStateNamesInput] = useState<string[]>([]);
-  const [matrixInput, setMatrixInput] = useState<number[][]>([]);
+  const [stateNamesInput, setStateNamesInput] = useState<string[]>(() => {
+    const saved = localStorage.getItem('stateNamesInput');
+    return saved ? JSON.parse(saved) : Array.from({ length: size }, (_, i) => `State ${String.fromCharCode(65 + i)}`);
+  });
+  
+  const [matrixInput, setMatrixInput] = useState<number[][]>(() => {
+    const saved = localStorage.getItem('matrixInput');
+    return saved ? JSON.parse(saved) : Array.from({ length: size }, () => Array(size).fill(1 / size));
+  });
 
-  // Update local state when size changes
   useEffect(() => {
-    setStateNamesInput(Array.from({ length: size }, (_, i) => `State ${String.fromCharCode(65 + i)}`));
-    setMatrixInput(Array.from({ length: size }, () => Array(size).fill(1 / size)));
+    localStorage.setItem('stateNamesInput', JSON.stringify(stateNamesInput));
+    localStorage.setItem('matrixInput', JSON.stringify(matrixInput));
+  }, [stateNamesInput, matrixInput]);
+
+  useEffect(() => {
+    if (stateNamesInput.length === 0 || stateNamesInput.length !== size) {
+      setStateNamesInput(Array.from({ length: size }, (_, i) => `State ${String.fromCharCode(65 + i)}`));
+      setMatrixInput(Array.from({ length: size }, () => Array(size).fill(1 / size)));
+    }
   }, [size]);
 
   const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +50,6 @@ const MatrixInputForm: React.FC<MatrixInputFormProps> = ({ size, setSize, setMat
   };
 
   const handleApply = () => {
-    setSize(stateNamesInput.length);
     setMatrix(matrixInput);
     setStateNames(stateNamesInput);
   };
