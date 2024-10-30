@@ -11,8 +11,8 @@ interface MatrixInputFormProps {
 const MatrixInputForm: React.FC<MatrixInputFormProps> = ({ size, setSize, setMatrix, setStateNames }) => {
   const [stateNamesInput, setStateNamesInput] = useState<string[]>([]);
   const [matrixInput, setMatrixInput] = useState<number[][]>([]);
-  const [isMatrixFolded, setIsMatrixFolded] = useState(true);
-// Update local state when initialMatrix changes
+
+  // Update local state when size changes
   useEffect(() => {
     setStateNamesInput(Array.from({ length: size }, (_, i) => `State ${String.fromCharCode(65 + i)}`));
     setMatrixInput(Array.from({ length: size }, () => Array(size).fill(1 / size)));
@@ -61,7 +61,7 @@ const MatrixInputForm: React.FC<MatrixInputFormProps> = ({ size, setSize, setMat
   return (
     <div className="box has-background-grey-light">
       <div className="field">
-      <h4 className="title is-5">Number of States</h4>
+        <h4 className="title is-5">Number of States</h4>
         <div className="control">
           <input
             type="number"
@@ -75,60 +75,48 @@ const MatrixInputForm: React.FC<MatrixInputFormProps> = ({ size, setSize, setMat
       </div>
       <div className="field">
         <h4 className="title is-5">State Names and Transition Matrix</h4>
-        <button
-          onClick={() => setIsMatrixFolded(!isMatrixFolded)}
-          className="button is-link mb-3"
-        >
-          {isMatrixFolded ? 'Expand State Names and Matrix' : 'Fold State Names and Matrix'}
-        </button>
-        {isMatrixFolded ? (
-          <p className="help">State names and matrix are folded. Click "Expand State Names and Matrix" to view and edit.</p>
-        ) : (
-          <div className="columns">
-            <div className="column is-one-quarter">
-              <div className="state-names-list">
-                <h5 className="title is-6">State Names</h5>
-                {stateNamesInput.map((name, i) => (
-                  <div key={i} className="control mb-2">
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => handleStateNameChange(i, e.target.value)}
-                      className="input"
-                    />
+        <div className="columns">
+          <div className="column is-one-quarter">
+            <div className="state-names-list">
+              <h5 className="title is-6">State Names</h5>
+              {stateNamesInput.map((name, i) => (
+                <div key={i} className="control mb-2">
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => handleStateNameChange(i, e.target.value)}
+                    className="input"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="column">
+            <div className="matrix-container">
+              <h5 className="title is-6">Transition Matrix</h5>
+              <div className="matrix-grid" style={{ display: 'grid', gridTemplateRows: `repeat(${size}, auto)`, gap: '10px' }}>
+                {matrixInput.map((row, rowIndex) => (
+                  <div key={rowIndex} className="matrix-row" style={{ display: 'grid', gridTemplateColumns: `repeat(${size}, 80px)`, gap: '10px' }}>
+                    {row.map((value, colIndex) => (
+                      <input
+                        key={`${rowIndex}-${colIndex}`}
+                        type="number"
+                        value={value}
+                        step="0.1"
+                        min="0"
+                        max="1"
+                        onChange={(e) => handleMatrixChange(rowIndex, colIndex, e.target.value)}
+                        className="input matrix-input-field"
+                      />
+                    ))}
                   </div>
                 ))}
               </div>
             </div>
-            <div className="column">
-              <div className="matrix-container">
-                <h5 className="title is-6">Transition Matrix</h5>
-                <div className="matrix-grid" style={{ display: 'grid', gridTemplateRows: `repeat(${size}, auto)`, gap: '10px' }}>
-                  {matrixInput.map((row, rowIndex) => (
-                    <div key={rowIndex} className="matrix-row" style={{ display: 'grid', gridTemplateColumns: `repeat(${size}, 80px)`, gap: '10px' }}>
-                      {row.map((value, colIndex) => (
-                        <input
-                          key={`${rowIndex}-${colIndex}`}
-                          type="number"
-                          value={value}
-                          step="0.1"
-                          min="0"
-                          max="1"
-                          onChange={(e) => handleMatrixChange(rowIndex, colIndex, e.target.value)}
-                          className="input matrix-input-field"
-                        />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            </div>
           </div>
-        )}
+        </div>
       </div>
       <div className="field">
-
         <div className="control">
           <input
             type="file"

@@ -182,7 +182,7 @@ const MarkovChainFlow = () => {
         <div className="modal-background" onClick={onClose}></div>
         <div
           id="matrix-modal"
-          className="modal-content has-background-light"
+          className="modal-content has-background-grey-light"
           style={{
             maxWidth: '800px',
             maxHeight: '80vh',
@@ -196,7 +196,7 @@ const MarkovChainFlow = () => {
           }}
           onMouseDown={handleDragStart}
         >
-          <div className="box has-background-light">
+          <div className="box has-background-grey-light">
             <h4 className="title is-4">Input Matrix</h4>
             {error && <div className="notification is-danger">{error}</div>}
             <MatrixInputForm 
