@@ -1,0 +1,17 @@
+{
+    "name": "React-Flask Dev Container",
+    "dockerFile": "Dockerfile",
+    "context": "..",
+    "features": {
+      "node": "latest",
+      "python": "latest"
+    },
+    "extensions": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "ms-python.python",
+      "ms-python.vscode-pylance"
+    ],
+    "postCreateCommand": "npm install && pip install -r requirements.txt"
+  }
+  
