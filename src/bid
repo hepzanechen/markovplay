@@ -1,0 +1,119 @@
+import React from 'react';
+import {
+  getBezierPath,
+  useStore,
+  BaseEdge,
+  type EdgeProps,
+  type ReactFlowState,
+  EdgeLabelRenderer
+} from '@xyflow/react';
+
+
+export type GetSpecialPathParams = {
+  sourceX: number;
+  sourceY: number;
+  targetX: number;
+  targetY: number;
+};
+export const getSpecialPath = (
+  { sourceX, sourceY, targetX, targetY }: GetSpecialPathParams,
+  offsetX: number,
+  offsetY: number,
+) => {
+  // Calculate midpoint coordinates
+  const centerX = (sourceX + targetX) / 2 + offsetX;
+  const centerY = (sourceY + targetY) / 2 + offsetY;
+
+  // Create the path
+  return `M ${sourceX} ${sourceY} Q ${centerX} ${centerY} ${targetX} ${targetY}`;
+};
+
+
+export default function CustomEdge({
+  source,
+  target,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  markerEnd,
+  label
+}: EdgeProps) {
+  const isBiDirectionEdge = useStore((s: ReactFlowState) => {
+    const edgeExists = s.edges.some(
+      (e) =>
+        (e.source === target && e.target === source) ||
+        (e.target === source && e.source === target),
+    );
+
+    return edgeExists;
+  });
+
+  const edgePathParams = {
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  };
+
+  let path = '';
+  // Determine if the edge is forward or backward
+  const isForward = source < target; // Define forward as source < target
+
+  // Function to get edge style based on direction
+  const getEdgeStyle = (isForward) => {
+  let strokeColor = 'black'; // Default color for other edges
+  strokeColor = isForward ? 'red' : 'blue'; // Red for forward, blue for backward
+  return {
+    strokeWidth: 2,
+    strokeDasharray: '5,5', // Optional dashed line
+    stroke: strokeColor,
+  };
+  };
+
+
+  // Determine offsets based on the relationship between source and target nodes
+  const offsetX = sourceY < targetY ? 100 : -100; // Control leftward/rightward curve
+  const offsetY = sourceX < targetX ? 100 : -100; // Control upward/downward curve
+  
+  if (isBiDirectionEdge) {
+    path = getSpecialPath(edgePathParams, offsetX, offsetY);
+  } else {
+    [path] = getBezierPath(edgePathParams);
+  }
+  
+
+// Render the edge
+return (
+  <>
+      <BaseEdge path={path} markerEnd={markerEnd} style={getEdgeStyle(isForward)}/>
+      {label && (
+        <EdgeLabelRenderer>
+          <>
+            <div
+              style={{
+                position: 'absolute',
+                transform: isForward
+                ? `translate(${(sourceX + targetX) / 2 + 10}px, ${(sourceY + targetY) / 2 - 10}px) translate(-50%, -50%)`
+                : `translate(${(sourceX + targetX) / 2 - 10}px, ${(sourceY + targetY) / 2 + 10}px) translate(-50%, -50%)`,
+  
+                background: '#E0E0E0',
+                padding: 5,
+                borderRadius: 5,
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+              className="nodrag nopan"
+            >
+              {label}
+            </div>
+          </>
+        </EdgeLabelRenderer>
+      )}
+    </>
+  );
+}

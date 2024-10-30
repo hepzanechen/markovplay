@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "jsx": "react-jsx",  // Ensures compatibility with React JSX.
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],  // Includes DOM and modern JavaScript features.
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "resolveJsonModule": true,
+    "allowJs": true,  // Allows JavaScript files to be part of the project.
+    "checkJs": false,  // If `true`, enables type checking for JavaScript files.
+    "isolatedModules": true,
+    "esModuleInterop": true,  // Enables better compatibility with common JS modules.
+    "allowSyntheticDefaultImports": true,  // Allows default imports from non-ES modules.
+    "moduleResolution": "node",  // Enables Node-style module resolution.
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "./**/*.d.ts",
+    "./**/*.{js,jsx,ts,tsx}"
+  ],
+  "exclude": ["node_modules"]
+}
