@@ -5,7 +5,6 @@ import {
   ReactFlow,
   useNodesState,
   useEdgesState,
-  addEdge,
   Controls,
   Background,
   ConnectionMode,
@@ -200,3 +199,4 @@ const MarkovChainFlow = () => {
 };
 
 export default MarkovChainFlow;
+
