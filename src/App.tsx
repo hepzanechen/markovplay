@@ -150,31 +150,52 @@ const MarkovChainFlow = () => {
     }
   }, [size, matrix, stateNames]);
 
+  
+  const MatrixModal = ({ isVisible, onClose, size, setSize, setMatrix, setStateNames, error }) => {
+    if (!isVisible) return null;
+  
+    return (
+      <div className="modal is-active">
+        <div className="modal-background" onClick={onClose}></div>
+        <div className="modal-content" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+          <div className="box">
+            <h4 className="title is-4">Input Matrix</h4>
+            {error && <div className="notification is-danger">{error}</div>}
+            <MatrixInputForm size={size} setSize={setSize} setMatrix={setMatrix} setStateNames={setStateNames} />
+            <button className="button is-danger" onClick={onClose}>Close</button>
+          </div>
+        </div>
+        <button className="modal-close is-large" aria-label="close" onClick={onClose}></button>
+      </div>
+    );
+  };
+  
+  
+  const [isModalVisible, setModalVisible] = useState(false);
+
 
   return (
     <div className="container">
-      <section className="hero is-primary">
-        <div className="hero-body">
-          <p className="title">Markov Chain Visualizer</p>
-          <p className="subtitle">Interactive Markov Chain Playground</p>
+      <section className="hero is-dark">
+        <div className="hero-body has-text-centered">
+          <p className="title" style={{ marginBottom: '0.5rem' }}>Markov Chain Visualizer</p>
+          <p className="subtitle" style={{ marginTop: '0.5rem' }}>Interactive Markov Chain Playground</p>
         </div>
       </section>
+  
       <section className="section">
-        <div className="columns">
+        <div className="columns is-multiline">
           <div className="column is-one-third">
-            <div className="box">
-              <h4 className="title is-4">Input Form</h4>
-              <MatrixInputForm
-                size={size}
-                setSize={setSize}
-                setMatrix={setMatrix}
-                setStateNames={setStateNames}
-              />
+            <div className="box has-background-white">
+            <h4 className="title is-4 has-text-dark">Input Form</h4>
+              <button className="button is-link" onClick={() => setModalVisible(true)}>
+                Show Matrix
+              </button>
               {error && <div className="notification is-danger">{error}</div>}
             </div>
           </div>
-          <div className="column">
-            <div className="box" style={{ width: '100%', height: '50vh' }}>
+          <div className="column is-two-thirds">
+            <div className="box" style={{ height: '50vh', marginTop: '1rem' }}>
               <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -186,6 +207,7 @@ const MarkovChainFlow = () => {
                 fitView
                 attributionPosition="top-right"
                 connectionMode={ConnectionMode.Loose}
+                style={{ background: '#f9f9f9' }} // Light background for React Flow
               >
                 <Controls />
                 <Background />
@@ -194,8 +216,21 @@ const MarkovChainFlow = () => {
           </div>
         </div>
       </section>
+  
+      <MatrixModal
+      isVisible={isModalVisible}
+      onClose={() => setModalVisible(false)}
+      size={size}
+      setSize={setSize}
+      setMatrix={setMatrix}
+      setStateNames={setStateNames}
+      error={error} // Pass error to the modal
+    />
+
     </div>
   );
+  
+  
 };
 
 export default MarkovChainFlow;
