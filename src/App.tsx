@@ -12,11 +12,11 @@ import {
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-import SelfConnectingEdge from './SelfConnectingEdge';
-import BiDirectionalEdge from './BiDirectionalEdge';
-import BiDirectionalNode from './BiDirectionalNode';
-import MatrixInputForm from './MatrixInput';
-import validateMatrix from './validateMatrix';
+import SelfConnectingEdge from './components/SelfConnectingEdge';
+import BiDirectionalEdge from './components/BiDirectionalEdge';
+import BiDirectionalNode from './components/BiDirectionalNode';
+import MatrixInputForm from './components/MatrixInput';
+import validateMatrix from './utils/validateMatrix';
 
 
 // Create matrix of transition probabilities
