@@ -132,11 +132,12 @@ const MarkovChainFlow = () => {
   const [size, setSize] = useState(6); // Default size
   const [stateNames, setStateNames] = useState(Array.from({ length: size }, (_, i) => `State ${String.fromCharCode(65 + i)}`));
   const [matrix, setMatrix] = useState(createMatrix(size));
-  const [nodes, setNodes, onNodesChange] = useNodesState(createNodes(size,stateNames));
+  const [nodes, setNodes, onNodesChange] = useNodesState(createNodes(size, stateNames));
   const [edges, setEdges, onEdgesChange] = useEdgesState(createEdges(matrix, nodes));
 
-  
   const [error, setError] = useState(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ top: '50%', left: '50%' });
 
   useEffect(() => {
     const validationError = validateMatrix(matrix);
@@ -150,44 +151,84 @@ const MarkovChainFlow = () => {
     }
   }, [size, matrix, stateNames]);
 
-  
-  const MatrixModal = ({ isVisible, onClose, size, setSize, setMatrix, setStateNames, error }) => {
+  const handleDragStart = (e) => {
+    const modal = document.getElementById('matrix-modal');
+    const offset = {
+      x: e.clientX - modal.getBoundingClientRect().left,
+      y: e.clientY - modal.getBoundingClientRect().top,
+    };
+
+    const onMouseMove = (moveEvent) => {
+      setModalPosition({
+        top: `${moveEvent.clientY - offset.y}px`,
+        left: `${moveEvent.clientX - offset.x}px`,
+      });
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
+  const MatrixModal = ({ isVisible, onClose, size, setSize, setMatrix, setStateNames, error, matrix }) => {
     if (!isVisible) return null;
-  
+
     return (
-      <div className="modal is-active">
+      <div className="modal is-active" style={{ zIndex: 1000 }}>
         <div className="modal-background" onClick={onClose}></div>
-        <div className="modal-content" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-          <div className="box">
+        <div
+          id="matrix-modal"
+          className="modal-content has-background-light"
+          style={{
+            maxWidth: '800px',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            position: 'absolute',
+            top: modalPosition.top,
+            left: modalPosition.left,
+            cursor: 'move',
+            border: '1px solid #ccc',
+            borderRadius: '5px',
+          }}
+          onMouseDown={handleDragStart}
+        >
+          <div className="box has-background-light">
             <h4 className="title is-4">Input Matrix</h4>
             {error && <div className="notification is-danger">{error}</div>}
-            <MatrixInputForm size={size} setSize={setSize} setMatrix={setMatrix} setStateNames={setStateNames} />
+            <MatrixInputForm 
+              size={size} 
+              setSize={setSize} 
+              setMatrix={setMatrix} 
+              setStateNames={setStateNames} 
+              initialMatrix={matrix} // Pass the current matrix
+            />
             <button className="button is-danger" onClick={onClose}>Close</button>
           </div>
         </div>
         <button className="modal-close is-large" aria-label="close" onClick={onClose}></button>
       </div>
     );
-  };
-  
-  
-  const [isModalVisible, setModalVisible] = useState(false);
+};
 
 
   return (
     <div className="container">
-      <section className="hero is-dark">
+      <section className="hero is-light">
         <div className="hero-body has-text-centered">
           <p className="title" style={{ marginBottom: '0.5rem' }}>Markov Chain Visualizer</p>
           <p className="subtitle" style={{ marginTop: '0.5rem' }}>Interactive Markov Chain Playground</p>
         </div>
       </section>
-  
+
       <section className="section">
         <div className="columns is-multiline">
           <div className="column is-one-third">
             <div className="box has-background-white">
-            <h4 className="title is-4 has-text-dark">Input Form</h4>
+              <h4 className="title is-4 has-text-black">Input Form</h4>
               <button className="button is-link" onClick={() => setModalVisible(true)}>
                 Show Matrix
               </button>
@@ -195,19 +236,19 @@ const MarkovChainFlow = () => {
             </div>
           </div>
           <div className="column is-two-thirds">
-            <div className="box" style={{ height: '50vh', marginTop: '1rem' }}>
+            <div className="box" style={{ height: '50vh', marginTop: '1rem', backgroundColor: '#f9f9f9' }}>
               <ReactFlow
                 nodes={nodes}
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 snapToGrid={true}
-                edgeTypes={edgeTypes}
-                nodeTypes={nodeTypes}
+                edgeTypes={edgeTypes} // Define your edge types here
+                nodeTypes={nodeTypes} // Define your node types here
                 fitView
                 attributionPosition="top-right"
                 connectionMode={ConnectionMode.Loose}
-                style={{ background: '#f9f9f9' }} // Light background for React Flow
+                style={{ background: '#f9f9f9' }}
               >
                 <Controls />
                 <Background />
@@ -216,22 +257,18 @@ const MarkovChainFlow = () => {
           </div>
         </div>
       </section>
-  
-      <MatrixModal
-      isVisible={isModalVisible}
-      onClose={() => setModalVisible(false)}
-      size={size}
-      setSize={setSize}
-      setMatrix={setMatrix}
-      setStateNames={setStateNames}
-      error={error} // Pass error to the modal
-    />
 
+      <MatrixModal
+        isVisible={isModalVisible}
+        onClose={() => setModalVisible(false)}
+        size={size}
+        setSize={setSize}
+        setMatrix={setMatrix}
+        setStateNames={setStateNames}
+        error={error} // Pass error to the modal
+      />
     </div>
   );
-  
-  
 };
 
 export default MarkovChainFlow;
-

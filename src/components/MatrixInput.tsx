@@ -12,7 +12,7 @@ const MatrixInputForm: React.FC<MatrixInputFormProps> = ({ size, setSize, setMat
   const [stateNamesInput, setStateNamesInput] = useState<string[]>([]);
   const [matrixInput, setMatrixInput] = useState<number[][]>([]);
   const [isMatrixFolded, setIsMatrixFolded] = useState(true);
-
+// Update local state when initialMatrix changes
   useEffect(() => {
     setStateNamesInput(Array.from({ length: size }, (_, i) => `State ${String.fromCharCode(65 + i)}`));
     setMatrixInput(Array.from({ length: size }, () => Array(size).fill(1 / size)));
@@ -59,7 +59,7 @@ const MatrixInputForm: React.FC<MatrixInputFormProps> = ({ size, setSize, setMat
   };
 
   return (
-    <div className="box">
+    <div className="box has-background-grey-light">
       <div className="field">
       <h4 className="title is-5">Number of States</h4>
         <div className="control">
