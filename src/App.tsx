@@ -10,6 +10,7 @@ import {
   ConnectionMode,
   type Edge,
 } from '@xyflow/react';
+import { calculateSteadyState } from './utils/markovCalculations'; // Import the calculation function
 
 import '@xyflow/react/dist/style.css';
 import SelfConnectingEdge from './components/SelfConnectingEdge';
@@ -138,7 +139,9 @@ const MarkovChainFlow = () => {
   const [error, setError] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [modalPosition, setModalPosition] = useState({ top: '50%', left: '50%' });
-
+  //interacting with backend
+  const [steadyState, setSteadyState] = useState([]); // State to hold steady-state probabilities
+  const [isCalculationModalVisible, setCalculationModalVisible] = useState(false); // New state
   useEffect(() => {
     const validationError = validateMatrix(matrix);
     if (validationError) {
@@ -150,7 +153,15 @@ const MarkovChainFlow = () => {
       setEdges(createEdges(matrix, newNodes)); // Use updated nodes here
     }
   }, [size, matrix, stateNames]);
-
+  const handleCalculateProperties = async () => {
+    try {
+      const response = await calculateSteadyState(matrix);
+      setSteadyState(response.steadyState);
+      setCalculationModalVisible(true);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
   const handleDragStart = (e) => {
     const modal = document.getElementById('matrix-modal');
     const offset = {
@@ -217,7 +228,7 @@ const MarkovChainFlow = () => {
 
   return (
     <div className="container">
-      <section className="hero is-light">
+      <section className="hero is-white">
         <div className="hero-body has-text-centered">
           <p className="title" style={{ marginBottom: '0.5rem' }}>Markov Chain Visualizer</p>
           <p className="subtitle" style={{ marginTop: '0.5rem' }}>Interactive Markov Chain Playground</p>
@@ -234,6 +245,24 @@ const MarkovChainFlow = () => {
               </button>
               {error && <div className="notification is-danger">{error}</div>}
             </div>
+                  {/* Calculation Result Modal */}
+      <button className="button is-primary" onClick={handleCalculateProperties}>
+        Calculate Properties
+      </button>
+      {isCalculationModalVisible && (
+        <div className="modal is-active">
+          <div className="modal-background" onClick={() => setCalculationModalVisible(false)}></div>
+          <div className="modal-content">
+            <div className="box has-background-light">
+              <h3 className="title is-4">Steady State Probabilities:</h3>
+              <p>{steadyState.map(prob => prob.toFixed(2)).join(', ')}</p>
+              <button className="button is-danger" onClick={() => setCalculationModalVisible(false)}>Close</button>
+            </div>
+          </div>
+          <button className="modal-close is-large" aria-label="close" onClick={() => setCalculationModalVisible(false)}></button>
+        </div>
+      )}
+
           </div>
           <div className="column is-two-thirds">
             <div className="box" style={{ height: '50vh', marginTop: '1rem', backgroundColor: '#f9f9f9' }}>
