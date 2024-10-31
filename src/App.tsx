@@ -21,10 +21,19 @@ import validateMatrix from './utils/validateMatrix';
 
 
 // Create matrix of transition probabilities
-const createMatrix = (n) => {
-  const matrix = Array.from({ length: n }, () => Array(n).fill(1 / n));
-  return matrix;
-};
+ const createMatrix = (n) => {
+   const matrix = Array.from({ length: n }, () => Array(n).fill(1 / n));
+   return matrix;
+ };
+// const createMatrix = (n) => {
+//   if (n === 2) {
+//     return [[1, 0], [0.5, 0.5]];
+//   }
+  
+//   // Default behavior for other values of n
+//   const matrix = Array.from({ length: n }, () => Array(n).fill(1 / n));
+//   return matrix;
+// };
 const edgeTypes = {
   bidirectional: BiDirectionalEdge,
   selfconnecting: SelfConnectingEdge,
@@ -130,7 +139,7 @@ const createEdges = (matrix, nodesArray) => {
 
 // Main component to visualize the Markov chain
 const MarkovChainFlow = () => {
-  const [size, setSize] = useState(6); // Default size
+  const [size, setSize] = useState(2); // Default size
   const [stateNames, setStateNames] = useState(Array.from({ length: size }, (_, i) => `State ${String.fromCharCode(65 + i)}`));
   const [matrix, setMatrix] = useState(createMatrix(size));
   const [nodes, setNodes, onNodesChange] = useNodesState(createNodes(size, stateNames));
