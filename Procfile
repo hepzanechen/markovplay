@@ -1,1 +1,0 @@
-web: npm run build && npm run preview & gunicorn backend.app:app
